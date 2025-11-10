@@ -1,5 +1,10 @@
+import { readConfig, setUser } from "./config.js";
+
+
 function main() {
-  console.log("Hello, world!");
+  setUser("Kamiichii",readConfig());
+  const newConfig = readConfig();
+  console.log(newConfig);
 }
 
 main();
