@@ -1,7 +1,8 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
-export function setUser(username, configObj) {
+export function setUser(username) {
+    const configObj = readConfig();
     configObj.currentUserName = username;
     writeConfig(configObj);
 }

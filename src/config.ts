@@ -7,7 +7,8 @@ type Config = {
     currentUserName:string;
 };
 
-export function setUser(username:string,configObj:Config){
+export function setUser(username:string){
+    const configObj = readConfig();
     configObj.currentUserName = username;
     writeConfig(configObj);
 
