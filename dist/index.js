@@ -1,7 +1,8 @@
-import { handlerLogin, registerCommand, runCommand } from "./commands.js";
-function main() {
+import { handlerLogin, handlerRegister, registerCommand, runCommand } from "./commands.js";
+async function main() {
     let cmdRegistry = {};
     registerCommand(cmdRegistry, "login", handlerLogin);
+    registerCommand(cmdRegistry, "register", handlerRegister);
     const argv = process.argv.slice(2);
     if (argv.length === 0) {
         console.error("Please enter a command");
@@ -9,11 +10,12 @@ function main() {
     }
     const [cmdName, ...args] = argv;
     try {
-        runCommand(cmdRegistry, cmdName, ...args);
+        await runCommand(cmdRegistry, cmdName, ...args);
     }
     catch (err) {
         console.error(err.message ?? String(err));
         process.exit(1);
     }
+    process.exit(0);
 }
 main();
