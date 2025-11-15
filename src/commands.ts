@@ -1,6 +1,7 @@
 import { symlinkSync } from "fs";
 import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
+import { fetchFeed } from "./rss";
 
 type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -60,6 +61,11 @@ export async function handlerListUsers() {
             console.log(user.name);
         }
     }
+}
+
+export async function handlerAggregate(URL:string){
+    const feed = await fetchFeed("https://www.wagslane.dev/index.xml");
+    console.log(JSON.stringify(feed, null, 2));
 }
 
 export async function runCommand(registry: CommandsRegistry, cmdName: string, ...args: string[]){

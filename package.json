@@ -9,7 +9,7 @@
     "start": "tsx ./src/index.ts",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
-    "database":"sudo -u postgres psql"
+    "database": "sudo -u postgres psql"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.44.7",
+    "fast-xml-parser": "^5.3.2",
     "postgres": "^3.4.7"
   }
 }

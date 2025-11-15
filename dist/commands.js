@@ -1,5 +1,6 @@
 import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
+import { fetchFeed } from "./rss";
 export async function handlerLogin(cmdName, ...args) {
     if (args.length === 0) {
         throw new Error("You need to provide a username");
@@ -46,6 +47,10 @@ export async function handlerListUsers() {
             console.log(user.name);
         }
     }
+}
+export async function handlerAggregate(URL) {
+    const feed = await fetchFeed("https://www.wagslane.dev/index.xml");
+    console.log(JSON.stringify(feed, null, 2));
 }
 export async function runCommand(registry, cmdName, ...args) {
     const handler = registry[cmdName];
