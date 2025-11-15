@@ -9,3 +9,9 @@ export async function getUser(name) {
     const [result] = await db.select().from(users).where(eq(users.name, name));
     return result;
 }
+export async function resetUsers() {
+    await db.delete(users);
+}
+export async function getUsers() {
+    return await db.select().from(users);
+}

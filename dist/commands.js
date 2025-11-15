@@ -1,5 +1,5 @@
-import { setUser } from "./config";
-import { createUser, getUser } from "./lib/db/queries/users";
+import { readConfig, setUser } from "./config";
+import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
 export async function handlerLogin(cmdName, ...args) {
     if (args.length === 0) {
         throw new Error("You need to provide a username");
@@ -26,6 +26,26 @@ export async function handlerRegister(cmdName, ...args) {
     setUser(userName);
     console.log(`${userName} is created`);
     console.log(await getUser(userName));
+}
+export async function handlerReset() {
+    try {
+        await resetUsers();
+    }
+    catch (err) {
+        throw new Error("Couldnt reset the database");
+    }
+}
+export async function handlerListUsers() {
+    const users = await getUsers();
+    const currentUser = readConfig().currentUserName;
+    for (const user of users) {
+        if (user.name === currentUser) {
+            console.log(`${user.name} (current)`);
+        }
+        else {
+            console.log(user.name);
+        }
+    }
 }
 export async function runCommand(registry, cmdName, ...args) {
     const handler = registry[cmdName];

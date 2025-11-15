@@ -1,5 +1,6 @@
+import { symlinkSync } from "fs";
 import { readConfig, setUser } from "./config";
-import { createUser, getUser } from "./lib/db/queries/users";
+import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
 
 type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -40,6 +41,25 @@ export async function handlerRegister(cmdName:string ,...args:string[]){
     console.log(`${userName} is created`);
     console.log(await getUser(userName));
 
+}
+export async function handlerReset() {
+    try{
+        await resetUsers();
+    }catch(err){
+        throw new Error("Couldnt reset the database");
+    }
+}
+export async function handlerListUsers() {
+    const users = await getUsers();
+    const currentUser = readConfig().currentUserName;
+    for(const user of users){
+        if(user.name ===currentUser){
+            console.log(`${user.name} (current)`);
+        }
+        else{
+            console.log(user.name);
+        }
+    }
 }
 
 export async function runCommand(registry: CommandsRegistry, cmdName: string, ...args: string[]){
