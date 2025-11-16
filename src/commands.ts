@@ -1,7 +1,8 @@
 import { symlinkSync } from "fs";
 import { readConfig, setUser } from "./config";
-import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
+import { createUser, getUser, getUsers, resetUsers, User } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
+import { createFeed, Feed } from "./lib/db/queries/feeds";
 
 type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -68,8 +69,22 @@ export async function handlerAggregate(URL:string){
     console.log(JSON.stringify(feed, null, 2));
 }
 
+export async function handlerAddFeed(cmdName:string,name:string,url:string) {
+  const feed = await createFeed(name, url)
+  const user = await getUser(readConfig().currentUserName)
+  printFeed(feed,user);
+
+}
+
 export async function runCommand(registry: CommandsRegistry, cmdName: string, ...args: string[]){
   const handler = registry[cmdName];
   if (!handler) throw new Error(`unknown command: ${cmdName}`);
   await handler(cmdName, ...args);
+}
+
+export function printFeed(feed: Feed, user: User) {
+  console.log(`id: ${feed.id}`);
+  console.log(`name: ${feed.name}`);
+  console.log(`url: ${feed.url}`);
+  console.log(`user_id: ${feed.userId} (${user.name})`);
 }
