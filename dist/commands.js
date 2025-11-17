@@ -52,7 +52,7 @@ export async function handlerListUsers() {
 export async function handlerListFeeds() {
     const feeds = await getFeeds();
     for (const feed of feeds) {
-        const userName = getUserOfTheFeed(feed);
+        const userName = await getUserOfTheFeed(feed);
         console.log(feed.name);
         console.log(feed.url);
         console.log(userName);
