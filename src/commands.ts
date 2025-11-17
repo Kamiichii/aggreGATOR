@@ -1,8 +1,8 @@
 import { symlinkSync } from "fs";
 import { readConfig, setUser } from "./config";
-import { createUser, getUser, getUsers, resetUsers, User } from "./lib/db/queries/users";
+import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
-import { createFeed, Feed } from "./lib/db/queries/feeds";
+import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
 
 type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -64,6 +64,16 @@ export async function handlerListUsers() {
     }
 }
 
+export async function handlerListFeeds() {
+    const feeds = await getFeeds();
+    for(const feed of feeds){
+        const userName = getUserOfTheFeed(feed);
+        console.log(feed.name);
+        console.log(feed.url);
+        console.log(userName);
+    }
+}
+
 export async function handlerAggregate(URL:string){
     const feed = await fetchFeed("https://www.wagslane.dev/index.xml");
     console.log(JSON.stringify(feed, null, 2));
@@ -82,9 +92,3 @@ export async function runCommand(registry: CommandsRegistry, cmdName: string, ..
   await handler(cmdName, ...args);
 }
 
-export function printFeed(feed: Feed, user: User) {
-  console.log(`id: ${feed.id}`);
-  console.log(`name: ${feed.name}`);
-  console.log(`url: ${feed.url}`);
-  console.log(`user_id: ${feed.userId} (${user.name})`);
-}

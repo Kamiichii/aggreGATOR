@@ -1,8 +1,9 @@
 import { readConfig } from "src/config";
 import { db } from "..";
 import { feeds, users } from "../schema";
+import { getUser,User } from "./users";
 import { eq } from "drizzle-orm";
-import { getUser } from "./users";
+
 
 
 export type Feed = typeof feeds.$inferSelect;
@@ -18,3 +19,17 @@ export async function createFeed(name: string,url: string) {
   return result;
 }
 
+export async function getUserOfTheFeed(feed: Feed){
+  return await db.select().from(feeds).innerJoin(users,eq(feeds.userId,users.id)).where(eq(feeds.id,feed.id));
+}
+
+export async function getFeeds(){
+  return await db.select().from(feeds);
+}
+
+export function printFeed(feed: Feed, user: User) {
+  console.log(`id: ${feed.id}`);
+  console.log(`name: ${feed.name}`);
+  console.log(`url: ${feed.url}`);
+  console.log(`user_id: ${feed.userId} (${user.name})`);
+}

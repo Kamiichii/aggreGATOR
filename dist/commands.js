@@ -1,7 +1,7 @@
 import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
-import { createFeed } from "./lib/db/queries/feeds";
+import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
 export async function handlerLogin(cmdName, ...args) {
     if (args.length === 0) {
         throw new Error("You need to provide a username");
@@ -49,6 +49,15 @@ export async function handlerListUsers() {
         }
     }
 }
+export async function handlerListFeeds() {
+    const feeds = await getFeeds();
+    for (const feed of feeds) {
+        const userName = getUserOfTheFeed(feed);
+        console.log(feed.name);
+        console.log(feed.url);
+        console.log(userName);
+    }
+}
 export async function handlerAggregate(URL) {
     const feed = await fetchFeed("https://www.wagslane.dev/index.xml");
     console.log(JSON.stringify(feed, null, 2));
@@ -63,10 +72,4 @@ export async function runCommand(registry, cmdName, ...args) {
     if (!handler)
         throw new Error(`unknown command: ${cmdName}`);
     await handler(cmdName, ...args);
-}
-export function printFeed(feed, user) {
-    console.log(`id: ${feed.id}`);
-    console.log(`name: ${feed.name}`);
-    console.log(`url: ${feed.url}`);
-    console.log(`user_id: ${feed.userId} (${user.name})`);
 }
