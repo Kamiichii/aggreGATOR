@@ -1,4 +1,4 @@
-import { handlerAddFeed, handlerAggregate, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, registerCommand, runCommand } from "./commands.js";
+import { handlerAddFeed, handlerAggregate, handlerFollowFeed, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, registerCommand, runCommand } from "./commands.js";
 async function main() {
     let cmdRegistry = {};
     registerCommand(cmdRegistry, "login", handlerLogin);
@@ -8,6 +8,7 @@ async function main() {
     registerCommand(cmdRegistry, "agg", handlerAggregate);
     registerCommand(cmdRegistry, "addfeed", handlerAddFeed);
     registerCommand(cmdRegistry, "feeds", handlerListFeeds);
+    registerCommand(cmdRegistry, "follow", handlerFollowFeed);
     const argv = process.argv.slice(2);
     if (argv.length === 0) {
         console.error("Please enter a command");

@@ -26,7 +26,10 @@ export async function getUserOfTheFeed(feed: Feed){
 export async function getFeeds(){
   return await db.select().from(feeds);
 }
-
+export async function getFeed(url:string){
+  const [result] = await db.select().from(feeds).where(eq(feeds.url,url));
+  return result;
+}
 export function printFeed(feed: Feed, user: User) {
   console.log(`id: ${feed.id}`);
   console.log(`name: ${feed.name}`);

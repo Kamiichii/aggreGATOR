@@ -2,6 +2,7 @@ import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
 import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
+import { createFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
 export async function handlerLogin(cmdName, ...args) {
     if (args.length === 0) {
         throw new Error("You need to provide a username");
@@ -65,7 +66,20 @@ export async function handlerAggregate(URL) {
 export async function handlerAddFeed(cmdName, name, url) {
     const feed = await createFeed(name, url);
     const user = await getUser(readConfig().currentUserName);
+    await createFeedFollow(url);
     printFeed(feed, user);
+}
+export async function handlerFollowFeed(cmdName, url) {
+    const feedFollow = await createFeedFollow(url);
+    console.log(`user: ${feedFollow.userName}`);
+    console.log(`feed: ${feedFollow.feedName}`);
+}
+export async function handlerFollowing(cmdName) {
+    const currentUserName = readConfig().currentUserName;
+    const feedFollows = await getFeedFollowsForUser(currentUserName);
+    for (const feed of feedFollows) {
+        console.log(feed.feeds.name);
+    }
 }
 export async function runCommand(registry, cmdName, ...args) {
     const handler = registry[cmdName];
