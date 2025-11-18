@@ -15,6 +15,13 @@
       "when": 1763283520813,
       "tag": "0001_mute_may_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763453094086,
+      "tag": "0002_nostalgic_hemingway",
+      "breakpoints": true
     }
   ]
 }
