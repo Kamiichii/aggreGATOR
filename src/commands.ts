@@ -1,11 +1,17 @@
 import { symlinkSync } from "fs";
 import { readConfig, setUser } from "./config";
-import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
+import { createUser, getUser, getUsers, resetUsers, User } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
 import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
 import { createFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
 
-type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
+export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
+
+export type UserCommandHandler = (
+  cmdName: string,
+  user: User,
+  ...args: string[]
+) => Promise<void>;
 
 export type CommandsRegistry =Record<string,CommandHandler>;
 
@@ -80,24 +86,22 @@ export async function handlerAggregate(URL:string){
     console.log(JSON.stringify(feed, null, 2));
 }
 
-export async function handlerAddFeed(cmdName:string,name:string,url:string) {
+export async function handlerAddFeed(cmdName:string,user:User,name:string,url:string) {
   const feed = await createFeed(name, url)
-  const user = await getUser(readConfig().currentUserName)
-  await createFeedFollow(url);
+  await createFeedFollow(url,user);
   printFeed(feed,user);
 
 }
 
-export async function handlerFollowFeed(cmdName:string,url:string){
-    const feedFollow = await createFeedFollow(url);
+export async function handlerFollowFeed(cmdName:string,user:User,url:string){
+    const feedFollow = await createFeedFollow(url,user);
     console.log(`user: ${feedFollow.userName}`);
     console.log(`feed: ${feedFollow.feedName}`);
 
 }
 
-export async function handlerFollowing(cmdName:string) {
-    const currentUserName = readConfig().currentUserName;
-    const feedFollows = await getFeedFollowsForUser(currentUserName);
+export async function handlerFollowing(cmdName:string,user:User) {
+    const feedFollows = await getFeedFollowsForUser(user.name);
     for(const feed of feedFollows){
         console.log(feed.feeds.name);
     }

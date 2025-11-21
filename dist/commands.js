@@ -63,20 +63,18 @@ export async function handlerAggregate(URL) {
     const feed = await fetchFeed("https://www.wagslane.dev/index.xml");
     console.log(JSON.stringify(feed, null, 2));
 }
-export async function handlerAddFeed(cmdName, name, url) {
+export async function handlerAddFeed(cmdName, user, name, url) {
     const feed = await createFeed(name, url);
-    const user = await getUser(readConfig().currentUserName);
-    await createFeedFollow(url);
+    await createFeedFollow(url, user);
     printFeed(feed, user);
 }
-export async function handlerFollowFeed(cmdName, url) {
-    const feedFollow = await createFeedFollow(url);
+export async function handlerFollowFeed(cmdName, user, url) {
+    const feedFollow = await createFeedFollow(url, user);
     console.log(`user: ${feedFollow.userName}`);
     console.log(`feed: ${feedFollow.feedName}`);
 }
-export async function handlerFollowing(cmdName) {
-    const currentUserName = readConfig().currentUserName;
-    const feedFollows = await getFeedFollowsForUser(currentUserName);
+export async function handlerFollowing(cmdName, user) {
+    const feedFollows = await getFeedFollowsForUser(user.name);
     for (const feed of feedFollows) {
         console.log(feed.feeds.name);
     }

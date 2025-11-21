@@ -1,20 +1,13 @@
 import { feedFollows, feeds, users } from "../schema";
 import { db } from "..";
-import { readConfig } from "src/config";
 import { getUser } from "./users";
 import { eq } from "drizzle-orm";
 import { getFeed } from "./feeds";
-export async function createFeedFollow(feedURL) {
-    const currentUserName = readConfig().currentUserName;
-    if (!currentUserName)
-        throw new Error("No current user. Register first.");
-    const currentUser = await getUser(currentUserName);
-    if (!currentUser)
-        throw new Error(`User '${currentUserName}' not found.`);
+export async function createFeedFollow(feedURL, user) {
     const requestedFeed = await getFeed(feedURL);
     if (!requestedFeed)
         throw new Error(`Feed not found for URL: ${feedURL}`);
-    const [newFeedFollow] = await db.insert(feedFollows).values({ userId: currentUser.id, feedId: requestedFeed.id }).returning();
+    const [newFeedFollow] = await db.insert(feedFollows).values({ userId: user.id, feedId: requestedFeed.id }).returning();
     const [result] = await db
         .select({
         id: feedFollows.id,
