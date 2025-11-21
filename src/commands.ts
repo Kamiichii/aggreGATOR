@@ -3,7 +3,7 @@ import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers, User } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
 import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
-import { createFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
+import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -98,6 +98,10 @@ export async function handlerFollowFeed(cmdName:string,user:User,url:string){
     console.log(`user: ${feedFollow.userName}`);
     console.log(`feed: ${feedFollow.feedName}`);
 
+}
+
+export async function handlerUnfollowFeed(cmdName:string,user:User,url:string){
+    await deleteFeedFollow(user,url);
 }
 
 export async function handlerFollowing(cmdName:string,user:User) {

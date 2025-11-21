@@ -2,7 +2,7 @@ import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
 import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
-import { createFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
+import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
 export async function handlerLogin(cmdName, ...args) {
     if (args.length === 0) {
         throw new Error("You need to provide a username");
@@ -72,6 +72,9 @@ export async function handlerFollowFeed(cmdName, user, url) {
     const feedFollow = await createFeedFollow(url, user);
     console.log(`user: ${feedFollow.userName}`);
     console.log(`feed: ${feedFollow.feedName}`);
+}
+export async function handlerUnfollowFeed(cmdName, user, url) {
+    await deleteFeedFollow(user, url);
 }
 export async function handlerFollowing(cmdName, user) {
     const feedFollows = await getFeedFollowsForUser(user.name);
