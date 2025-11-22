@@ -6,7 +6,7 @@ type RSSFeed = {
     title: string;
     link: string;
     description: string;
-    item: RSSItem[];
+    items: RSSItem[];
   };
 };
 
@@ -64,7 +64,7 @@ export async function fetchFeed(feedURL: string):Promise<RSSFeed>{
             title:channelTitle,
             link:channelLink,
             description:channelDescription,
-            item:channelItems
+            items:channelItems
         }
     }
 

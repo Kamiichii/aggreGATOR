@@ -2,7 +2,8 @@ import { readConfig } from "src/config";
 import { db } from "..";
 import { feeds, users } from "../schema";
 import { getUser,User } from "./users";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { fetchFeed } from "src/rss";
 
 
 
@@ -35,4 +36,34 @@ export function printFeed(feed: Feed, user: User) {
   console.log(`name: ${feed.name}`);
   console.log(`url: ${feed.url}`);
   console.log(`user_id: ${feed.userId} (${user.name})`);
+}
+
+export async function markFeedFetched(feed:Feed){
+  await db
+  .update(feeds)
+  .set({updatedAt:sql`NOW()`,lastFetchedAt:sql`NOW()`})
+  .where(eq(feeds.id,feed.id));
+}
+
+export async function getNextFeedToFetch():Promise<Feed>{
+  const [result] = await db
+    .select()
+    .from(feeds)
+    .orderBy(sql`${feeds.lastFetchedAt} nulls first`)
+    .limit(1);
+  return result;
+ }
+
+ export async function scrapeFeeds(){
+     const nextFeed = await getNextFeedToFetch();
+     await markFeedFetched(nextFeed);
+     const fetchedFeed = await fetchFeed(nextFeed.url);
+     for(const item of fetchedFeed.channel.items){
+        console.log(item.title);
+     }
+
+ }
+
+ export function handleError(err: unknown) {
+  console.error("Error while scraping feeds:", err);
 }

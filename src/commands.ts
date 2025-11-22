@@ -2,7 +2,7 @@ import { symlinkSync } from "fs";
 import { readConfig, setUser } from "./config";
 import { createUser, getUser, getUsers, resetUsers, User } from "./lib/db/queries/users";
 import { fetchFeed } from "./rss";
-import { createFeed, getFeeds, getUserOfTheFeed, printFeed } from "./lib/db/queries/feeds";
+import { createFeed, getFeeds, getUserOfTheFeed, handleError, printFeed, scrapeFeeds } from "./lib/db/queries/feeds";
 import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
@@ -81,9 +81,25 @@ export async function handlerListFeeds() {
     }
 }
 
-export async function handlerAggregate(URL:string){
-    const feed = await fetchFeed("https://www.wagslane.dev/index.xml");
-    console.log(JSON.stringify(feed, null, 2));
+export async function handlerAggregate(cmdName:string,time_between_reqs:string){
+     console.log("RAW arg:", JSON.stringify(time_between_reqs));
+
+    const durationInterval = parseDuration(time_between_reqs);
+    console.log(`Collecting feeds every ${time_between_reqs}`);
+
+    scrapeFeeds().catch(handleError);
+    
+    const interval = setInterval(() => {
+        scrapeFeeds().catch(handleError);
+    }, durationInterval)
+
+    await new Promise<void>((resolve) => {
+        process.on("SIGINT", () => {
+            console.log("Shutting down feed aggregator...");
+            clearInterval(interval);
+            resolve();
+        });
+        });
 }
 
 export async function handlerAddFeed(cmdName:string,user:User,name:string,url:string) {
@@ -117,3 +133,19 @@ export async function runCommand(registry: CommandsRegistry, cmdName: string, ..
   await handler(cmdName, ...args);
 }
 
+function parseDuration(durationStr: string):number {
+    const regex = /^(\d+)(ms|s|m|h)$/;
+
+    const match = durationStr.match(regex);
+    if(!match) throw new Error("Invalid duration");
+
+    const value = Number(match[1]);
+    const unit = match[2];
+
+    if (unit === "ms") return value;
+    if (unit === "s") return value * 1000;
+    if (unit === "m") return value * 60 * 1000;
+    if (unit === "h") return value * 60 * 60 * 1000;
+
+    throw new Error("invalid unit");
+}
