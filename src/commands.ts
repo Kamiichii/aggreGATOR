@@ -4,6 +4,7 @@ import { createUser, getUser, getUsers, resetUsers, User } from "./lib/db/querie
 import { fetchFeed } from "./rss";
 import { createFeed, getFeeds, getUserOfTheFeed, handleError, printFeed, scrapeFeeds } from "./lib/db/queries/feeds";
 import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "./lib/db/queries/feedFollow";
+import { getPostsForUser } from "./lib/db/queries/posts";
 
 export type CommandHandler = (cmdName: string, ...args: string[]) => Promise<void>;
 
@@ -82,7 +83,6 @@ export async function handlerListFeeds() {
 }
 
 export async function handlerAggregate(cmdName:string,time_between_reqs:string){
-     console.log("RAW arg:", JSON.stringify(time_between_reqs));
 
     const durationInterval = parseDuration(time_between_reqs);
     console.log(`Collecting feeds every ${time_between_reqs}`);
@@ -100,6 +100,19 @@ export async function handlerAggregate(cmdName:string,time_between_reqs:string){
             resolve();
         });
         });
+}
+
+export async function handlerBrowse(cmdName:string,user:User,rawLimit?:string){
+    const limit = rawLimit ? Number(rawLimit) : 2
+    const posts = await getPostsForUser(user,limit);
+    for (const post of posts){
+        console.log();
+        console.log(`Title: ${post.post.title}`);
+        console.log(`Description: ${post.post.description}`);
+        console.log(`Publish Date: ${post.post.publishedAt}`);
+        console.log(`URL: ${post.post.url}`);
+       
+    }
 }
 
 export async function handlerAddFeed(cmdName:string,user:User,name:string,url:string) {

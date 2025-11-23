@@ -4,6 +4,7 @@ import { feeds, users } from "../schema";
 import { getUser,User } from "./users";
 import { eq, sql } from "drizzle-orm";
 import { fetchFeed } from "src/rss";
+import { createPost } from "./posts";
 
 
 
@@ -59,11 +60,27 @@ export async function getNextFeedToFetch():Promise<Feed>{
      await markFeedFetched(nextFeed);
      const fetchedFeed = await fetchFeed(nextFeed.url);
      for(const item of fetchedFeed.channel.items){
-        console.log(item.title);
+        const publishedAt = parsePublishedAt(item.pubDate);
+        await createPost(item.title,item.link,publishedAt,nextFeed,item.description);
      }
 
  }
 
  export function handleError(err: unknown) {
   console.error("Error while scraping feeds:", err);
+}
+
+function parsePublishedAt(raw: string | undefined): Date {
+  if (!raw) {
+    return new Date(); 
+  }
+
+  const date = new Date(raw);
+
+  if (isNaN(date.getTime())) {
+    console.warn("Could not parse pubDate:", raw)
+    return new Date();
+  }
+
+  return date;
 }
