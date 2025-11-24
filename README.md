@@ -1,7 +1,69 @@
-# aggreGATOR
 Gator is a RSS feed aggregator CLI app. It lets you to create different users, create new feeds, select which feeds
 to follow on which users, choese an inteval for the app to search these feeds for any updates and print these updates 
 to the console anytime you want 
+
+First thing you want to do is to is to download and install postgres sql:
+- macOS with brew
+
+`brew install postgresql@16`
+
+- Linux / WSL (Debian). Here are the docs from Microsoft, but simply:
+
+```
+sudo apt update
+sudo apt install postgresql postgresql-contrib 
+```
+
+Ensure the installation worked. The psql command-line utility is the default client for Postgres. Use it to make sure you're on version 16+ of Postgres:
+`psql --version`
+
+- (Linux only) Update postgres password:
+`sudo passwd postgres`
+
+- Enter a password, and be sure you won't forget it. You can just use something easy like postgres.
+
+- Start the Postgres server in the background
+
+- Mac: `brew services start postgresql@16`
+
+- Linux: `sudo service postgresql start`
+
+- Connect to the server. I recommend simply using the psql client. It's the "default" client for Postgres, and it's a great way to interact with the database. While it's not as user-friendly as a GUI like PGAdmin, it's a great tool to be able to do at least basic operations with.
+Enter the psql shell:
+
+Mac: `psql postgres`
+
+Linux: `sudo -u postgres psql`
+
+You should see a new prompt that looks like this:
+
+`postgres=#`
+
+- Create a new database. I called mine gator:
+`CREATE DATABASE gator;`
+
+- Connect to the new database:
+`\c gator`
+
+You should see a new prompt that looks like this:
+
+`gator=#`
+
+- Set the user password (Linux only)
+`ALTER USER postgres PASSWORD 'postgres';`
+
+For simplicity, I used postgres as the password. Before, we altered the system user's password, now we're altering the database user's password.
+
+Query the database
+From here you can run SQL queries against the gator database. For example, to see the version of Postgres you're running, you can run:
+
+`SELECT version();`
+
+You can type exit or use \q to leave the psql shell.
+
+then create a new .gatorconfig.json in the folder the app is in and then write:
+- `{"db_url":"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable","current_user_name":}`
+inside the file
 
 After downloading the app there are few commands you can run:
 * `npm run start login (username)` this command lets you to login as a user that you have already registered
@@ -19,4 +81,6 @@ ctrl + c also you might see an error starting with `Error while scraping feeds: 
 * `npm run start unfollow (url)` this unfollows the given feed for the logged in user
 * `npm run start browse (number)` only use this if you are already aggregating the followed feeds. This shows the last x amount 
 of feeds that are updated, x being the number you have provided when you enter this command
+
+
 
