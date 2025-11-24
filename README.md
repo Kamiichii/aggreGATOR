@@ -12,8 +12,8 @@ to the console anytime you want
 
 1. Clone the repo
 2. Install dependencies:
-   ```bash
-   npm install```
+    ```bash
+   npm install
 
 
 After that you want to do is to is to download and install postgres sql:
