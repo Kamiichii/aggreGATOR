@@ -1,4 +1,4 @@
-Gator is a RSS feed aggregator CLI app. It lets you to create different users, create new feeds, select which feeds
+aggreGator is a RSS feed aggregator CLI app. It lets you to create different users, create new feeds, select which feeds
 to follow on which users, choese an inteval for the app to search these feeds for any updates and print these updates 
 to the console anytime you want 
 
